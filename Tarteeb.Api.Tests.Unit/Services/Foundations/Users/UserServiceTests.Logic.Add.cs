@@ -23,7 +23,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Foundations.Users
             User randomUser = CreateRandomUser(randomDateTime);
             User inputUser = randomUser;
             User persistedUser = inputUser;
-            User expectedUser = persistedUser.DeepClone();
+            User exectedUser = persistedUser.DeepClone();
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetCurrentDateTime()).Returns(randomDateTime);
@@ -36,7 +36,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Foundations.Users
             User actualUser = await this.userService.AddUserAsync(inputUser);
 
             // then
-            actualUser.Should().BeEquivalentTo(expectedUser);
+            actualUser.Should().BeEquivalentTo(exectedUser);
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTime(), Times.Once);
