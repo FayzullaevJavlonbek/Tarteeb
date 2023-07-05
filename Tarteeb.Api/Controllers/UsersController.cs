@@ -12,6 +12,9 @@ using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
 using Tarteeb.Api.Services.Foundations.Users;
 using Tarteeb.Api.Services.Processings.Users;
+using Tarteeb.Api.Models.Foundations.Users;
+using Tarteeb.Api.Services.Foundations.Users;
+using Tarteeb.Api.Models.Foundations.Users.Exceptions;
 
 namespace Tarteeb.Api.Controllers
 {
@@ -27,7 +30,6 @@ namespace Tarteeb.Api.Controllers
             this.userProcessingService = userProcessingService;
             this.userService = userService;
         }
-            
 
         [HttpGet("{userId}")]
         public async ValueTask<ActionResult<Guid>> VerifyUserByIdAsync(Guid userId)
