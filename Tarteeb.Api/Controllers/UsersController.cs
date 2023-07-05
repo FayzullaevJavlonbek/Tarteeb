@@ -11,6 +11,10 @@ using Tarteeb.Api.Models.Foundations.Users.Exceptions;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Services.Processings.Users;
 using Tarteeb.Api.Services.Foundations.Users;
+using Microsoft.AspNetCore.OData.Query;
+using System.Linq;
+using Tarteeb.Api.Models.Foundations.Users.Exceptions;
+using Tarteeb.Api.Models.Foundations.Users;
 
 namespace Tarteeb.Api.Controllers
 {
@@ -41,6 +45,26 @@ namespace Tarteeb.Api.Controllers
             Guid activatedId = await this.userProcessingService.ActivateUserByIdAsync(userId);
 
             return Ok(activatedId);
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        public ActionResult<IQueryable<User>> GetAllUsers()
+        {
+            try
+            {
+                IQueryable<User> allUsers = this.userService.RetrieveAllUsers();
+
+                return Ok(allUsers);
+            }
+            catch (UserDependencyException userDependencyException)
+            {
+                return InternalServerError(userDependencyException.InnerException);
+            }
+            catch (UserServiceException userServiceException)
+            {
+                return InternalServerError(userServiceException.InnerException);
+            }
         }
 
         [HttpGet("{userId}")]
