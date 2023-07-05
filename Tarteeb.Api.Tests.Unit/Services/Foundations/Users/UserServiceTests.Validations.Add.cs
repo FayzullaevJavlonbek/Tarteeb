@@ -22,7 +22,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Foundations.Users
             User noUser = null;
             var nullUserException = new NullUserException();
 
-            var expectedUserValidationexception =
+            var expectedUserValidationException =
                 new UserValidationException(nullUserException);
 
             // when
@@ -34,11 +34,11 @@ namespace Tarteeb.Api.Tests.Unit.Services.Foundations.Users
 
             // then
             actualUserValidationException.Should().BeEquivalentTo(
-               expectedUserValidationexception);
+               expectedUserValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
-                    expectedUserValidationexception))), Times.Once);
+                    expectedUserValidationException))), Times.Once);
 
             this.storageBrokerMock.Verify(broker =>
                 broker.InsertUserAsync(It.IsAny<User>()), Times.Never);

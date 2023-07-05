@@ -7,6 +7,10 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RESTFulSense.Controllers;
+using Tarteeb.Api.Models.Foundations.Tickets.Exceptions;
+using Tarteeb.Api.Models.Foundations.Users;
+using Tarteeb.Api.Models.Foundations.Users.Exceptions;
+using Tarteeb.Api.Services.Foundations.Users;
 using Tarteeb.Api.Services.Processings.Users;
 
 namespace Tarteeb.Api.Controllers
@@ -16,9 +20,14 @@ namespace Tarteeb.Api.Controllers
     public class UsersController : RESTFulController
     {
         private readonly IUserProcessingService userProcessingService;
+        private readonly IUserService userService;
 
-        public UsersController(IUserProcessingService userProcessingService) =>
+        public UsersController(IUserProcessingService userProcessingService, IUserService userService)
+        {
             this.userProcessingService = userProcessingService;
+            this.userService = userService;
+        }
+            
 
         [HttpGet("{userId}")]
         public async ValueTask<ActionResult<Guid>> VerifyUserByIdAsync(Guid userId)
@@ -34,6 +43,32 @@ namespace Tarteeb.Api.Controllers
             Guid activatedId = await this.userProcessingService.ActivateUserByIdAsync(userId);
 
             return Ok(activatedId);
+        }
+        [HttpGet("{userId}")]
+        public async ValueTask<ActionResult<User>> GetUserByIdAsync(Guid userId)
+        {
+            try
+            {
+                return await this.userService.RetrieveUserByIdAsync(userId);
+            }
+            catch (UserDependencyException userDependencyException)
+            {
+                return InternalServerError(userDependencyException.InnerException);
+            }
+            catch (UserValidationException userValidationException)
+                when (userValidationException.InnerException is InvalidUserException)
+            {
+                return BadRequest(userValidationException.InnerException);
+            }
+            catch (UserValidationException userValidationException)
+                when (userValidationException.InnerException is NotFoundUserException)
+            {
+                return NotFound(userValidationException.InnerException);
+            }
+            catch (UserServiceException userServiceException)
+            {
+                return InternalServerError(userServiceException.InnerException);
+            }
         }
     }
 }
