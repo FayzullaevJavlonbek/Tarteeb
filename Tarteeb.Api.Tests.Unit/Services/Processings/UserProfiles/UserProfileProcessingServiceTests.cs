@@ -99,5 +99,23 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
 
             return filler;
         }
+
+        private User ConvertToUser(UserProfile userProfile)
+        {
+            return new User
+            {
+                Id = userProfile.Id,
+                FirstName = userProfile.FirstName,
+                LastName = userProfile.LastName,
+                PhoneNumber = userProfile.PhoneNumber,
+                Email = userProfile.Email,
+                BirthDate = userProfile.BirthDate,
+                IsActive = userProfile.IsActive,
+                IsVerified = userProfile.IsVerified,
+                GitHubUsername = userProfile.GitHubUsername,
+                TelegramUsername = userProfile.TelegramUsername,
+                TeamId = userProfile.TeamId
+            };
+        }
     }
 }

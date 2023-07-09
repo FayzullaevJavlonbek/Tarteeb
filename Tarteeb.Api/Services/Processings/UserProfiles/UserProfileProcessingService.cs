@@ -37,6 +37,11 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             return populatedUserProfile;
         });
 
+        public ValueTask<UserProfile> ModifyUserProfileAsync(UserProfile userProfile)
+        {
+            throw new NotImplementedException();
+        }
+
         private UserProfile PopulateUserProfile(User user)
         {
             return new UserProfile

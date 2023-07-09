@@ -12,5 +12,6 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
     public interface IUserProfileProcessingService
     {
         ValueTask<UserProfile> RetrieveUserProfileByIdAsync(Guid userProfileId);
+        ValueTask<UserProfile> ModifyUserProfileAsync(UserProfile userProfile);
     }
 }
