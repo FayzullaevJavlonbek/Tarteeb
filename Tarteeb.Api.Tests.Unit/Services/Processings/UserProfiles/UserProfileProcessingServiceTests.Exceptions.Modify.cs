@@ -39,13 +39,13 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 TeamId = randomUserProfileProperties.TeamId
             };
 
-            Guid inputUserGuid = inputUserProfile.Id;
+            Guid inputUserProfileGuid = inputUserProfile.Id;
 
             var expectedUserProfileProcessingValidationException =
                 new UserProfileProcessingDependencyValidationException(dependencyValidationException.InnerException as Xeption);
 
             this.userServiceMock.Setup(service =>
-                service.RetrieveUserByIdAsync(inputUserGuid))
+                service.RetrieveUserByIdAsync(inputUserProfileGuid))
                     .ThrowsAsync(dependencyValidationException);
             
             // when
@@ -61,11 +61,65 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 .BeEquivalentTo(expectedUserProfileProcessingValidationException);
 
             this.userServiceMock.Verify(service =>
-                service.RetrieveUserByIdAsync(inputUserGuid), 
+                service.RetrieveUserByIdAsync(inputUserProfileGuid), 
                     Times.Once);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(expectedUserProfileProcessingValidationException))), 
+                    Times.Once);
+
+            this.userServiceMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Theory]
+        [MemberData(nameof(UserDependencyExceptions))]
+        public async Task ShouldThrowDependencyExceptionOnModifyIfDependencyErrorOccursAndLogItAsync(
+            Xeption dependencyException)
+        {
+            // given
+            dynamic randomUserProfileProperties = CreateRandomUserProfileProperties();
+
+            var inputUserProfile = new UserProfile
+            {
+                Id = randomUserProfileProperties.Id,
+                FirstName = randomUserProfileProperties.FirstName,
+                LastName = randomUserProfileProperties.LastName,
+                PhoneNumber = randomUserProfileProperties.PhoneNumber,
+                Email = randomUserProfileProperties.Email,
+                BirthDate = randomUserProfileProperties.BirthDate,
+                IsActive = randomUserProfileProperties.IsActive,
+                IsVerified = randomUserProfileProperties.IsVerified,
+                GitHubUsername = randomUserProfileProperties.GitHubUsername,
+                TelegramUsername = randomUserProfileProperties.TelegramUsername,
+                TeamId = randomUserProfileProperties.TeamId
+            };
+
+            Guid inputUserProfileGuid = inputUserProfile.Id;
+
+            var expectedUserProfileProcessingDependencyException = 
+                new UserProfileProcessingDependencyException(dependencyException.InnerException as Xeption);
+
+            this.userServiceMock.Setup(service =>
+                service.RetrieveUserByIdAsync(inputUserProfileGuid))
+                    .ThrowsAsync(dependencyException);
+
+            // when
+            ValueTask<UserProfile> modifyUserProfileTask =
+                this.userProfileProcessingService.ModifyUserProfileAsync(inputUserProfile);
+
+            UserProfileProcessingDependencyException actualUserProfileProcessingDependencyException =
+                await Assert.ThrowsAsync<UserProfileProcessingDependencyException>(modifyUserProfileTask.AsTask);
+
+            // then
+            actualUserProfileProcessingDependencyException.Should().BeEquivalentTo(expectedUserProfileProcessingDependencyException);   
+
+            this.userServiceMock.Verify(service => 
+                service.RetrieveUserByIdAsync(inputUserProfileGuid), 
+                    Times.Once); 
+
+            this.loggingBrokerMock.Verify(broker => 
+                broker.LogError(It.Is(SameExceptionAs(expectedUserProfileProcessingDependencyException))),
                     Times.Once);
 
             this.userServiceMock.VerifyNoOtherCalls();
