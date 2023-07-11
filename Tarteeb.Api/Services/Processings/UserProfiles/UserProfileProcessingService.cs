@@ -37,15 +37,19 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             return populatedUserProfile;
         });
 
-        public async ValueTask<UserProfile> ModifyUserProfileAsync(UserProfile userProfile) 
+        public ValueTask<UserProfile> ModifyUserProfileAsync(UserProfile userProfile) =>
+        TryCatch(async () =>
         {
+            ValidateUserProfileOnModify(userProfile);
             var maybeUser = await this.userService.RetrieveUserByIdAsync(userProfile.Id);
+            ValidateStorageUser(userProfile.Id, maybeUser);
             User populatedUser = PopulateUser(userProfile);
             User modifiedUser = await this.userService.ModifyUserAsync(populatedUser);
             UserProfile populatedUserProfile = PopulateUserProfile(modifiedUser);
 
             return populatedUserProfile;
-        }
+        });
+        
 
         private UserProfile PopulateUserProfile(User user)
         {

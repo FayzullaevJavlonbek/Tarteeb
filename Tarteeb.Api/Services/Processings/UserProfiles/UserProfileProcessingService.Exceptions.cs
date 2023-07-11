@@ -22,7 +22,11 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             {
                 return await returningFunction();
             }
-            catch(InvalidUserProfileProcessingException invalidUserProfileException)
+            catch (NullUserProfileProcessingException nullUserProfileException)
+            {
+                throw CreateAndLogValidationException(nullUserProfileException);
+            }
+            catch (InvalidUserProfileProcessingException invalidUserProfileException)
             {
                 throw CreateAndLogValidationException(invalidUserProfileException);
             }
