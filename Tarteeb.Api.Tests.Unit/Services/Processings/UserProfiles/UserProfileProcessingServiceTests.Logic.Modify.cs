@@ -16,7 +16,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
     public partial class UserProfileProcessingServiceTests
     {
         [Fact]
-        public async Task ShouldModifyUserProfile()
+        public async Task ShouldModifyUserProfileAsync()
         {
             // given
             dynamic randomUserProfileProperties = CreateRandomUserProfileProperties();
@@ -36,19 +36,35 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 TeamId = randomUserProfileProperties.TeamId
             };
 
+            var randomUser = new User
+            {
+                Id = randomUserProfileProperties.Id,
+                FirstName = randomUserProfileProperties.FirstName,
+                LastName = randomUserProfileProperties.LastName,
+                PhoneNumber = randomUserProfileProperties.PhoneNumber,
+                Email = randomUserProfileProperties.Email,
+                BirthDate = randomUserProfileProperties.BirthDate,
+                IsActive = randomUserProfileProperties.IsActive,
+                IsVerified = randomUserProfileProperties.IsVerified,
+                GitHubUsername = randomUserProfileProperties.GitHubUsername,
+                TelegramUsername = randomUserProfileProperties.TelegramUsername,
+                TeamId = randomUserProfileProperties.TeamId
+            };
+
             UserProfile inputUserProfile = randomUserProfile;
             UserProfile expectedUserProfile = inputUserProfile.DeepClone();
 
-            User randomUser = ConvertToUser(randomUserProfile);
             User storageUser = randomUser;
-            User inputUser = ConvertToUser(inputUserProfile);
+            User inputUser = randomUser;
+            User modifiedUser = inputUser;
 
             this.userServiceMock.Setup(service =>
                 service.RetrieveUserByIdAsync(inputUser.Id))
                     .ReturnsAsync(storageUser);
 
             this.userServiceMock.Setup(service =>
-                service.ModifyUserAsync(inputUser)).ReturnsAsync(inputUser);
+                service.ModifyUserAsync(It.Is(SameUserAs(inputUser))))
+                    .ReturnsAsync(modifiedUser);
 
             // when
             UserProfile actualUserProfile =
@@ -62,7 +78,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 service.RetrieveUserByIdAsync(inputUser.Id), Times.Once);
 
             this.userServiceMock.Verify(service =>
-                service.ModifyUserAsync(inputUser), Times.Once);
+                service.ModifyUserAsync(It.Is(SameUserAs(inputUser))), Times.Once);
 
             this.userServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

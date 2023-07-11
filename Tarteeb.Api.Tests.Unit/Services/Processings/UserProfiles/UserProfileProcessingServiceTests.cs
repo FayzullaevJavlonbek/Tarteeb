@@ -7,11 +7,8 @@ using Moq;
 using System;
 using System.Linq.Expressions;
 using Tarteeb.Api.Brokers.Loggings;
-using Tarteeb.Api.Models.Foundations.Emails;
-using Tarteeb.Api.Models.Foundations.Teams;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
-using Tarteeb.Api.Models.Processings.UserProfiles;
 using Tarteeb.Api.Services.Foundations.Users;
 using Tarteeb.Api.Services.Processings.UserProfiles;
 using Tynamix.ObjectFiller;
@@ -100,22 +97,23 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
             return filler;
         }
 
-        private User ConvertToUser(UserProfile userProfile)
+        private static Expression<Func<User, bool>> SameUserAs(User expectedUser)
         {
-            return new User
-            {
-                Id = userProfile.Id,
-                FirstName = userProfile.FirstName,
-                LastName = userProfile.LastName,
-                PhoneNumber = userProfile.PhoneNumber,
-                Email = userProfile.Email,
-                BirthDate = userProfile.BirthDate,
-                IsActive = userProfile.IsActive,
-                IsVerified = userProfile.IsVerified,
-                GitHubUsername = userProfile.GitHubUsername,
-                TelegramUsername = userProfile.TelegramUsername,
-                TeamId = userProfile.TeamId
-            };
+            return actualUser =>
+                    actualUser.Id == expectedUser.Id
+                    && actualUser.FirstName == expectedUser.FirstName
+                    && actualUser.LastName == expectedUser.LastName
+                    && actualUser.PhoneNumber == expectedUser.PhoneNumber
+                    && actualUser.Email == expectedUser.Email
+                    && actualUser.BirthDate == expectedUser.BirthDate
+                    && actualUser.CreatedDate == expectedUser.CreatedDate
+                    && actualUser.UpdatedDate == expectedUser.UpdatedDate
+                    && actualUser.Password == expectedUser.Password
+                    && actualUser.IsActive == expectedUser.IsActive
+                    && actualUser.IsVerified == expectedUser.IsVerified
+                    && actualUser.GitHubUsername == expectedUser.GitHubUsername
+                    && actualUser.TelegramUsername == expectedUser.TelegramUsername
+                    && actualUser.TeamId == expectedUser.TeamId;
         }
     }
 }
