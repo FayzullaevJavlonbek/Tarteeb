@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using Tarteeb.Api.Brokers.Loggings;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
+using Tarteeb.Api.Models.Processings.UserProfiles;
 using Tarteeb.Api.Services.Foundations.Users;
 using Tarteeb.Api.Services.Processings.UserProfiles;
 using Tynamix.ObjectFiller;
@@ -90,6 +91,19 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
         private Filler<User> CreateUserFiller(DateTimeOffset dates)
         {
             var filler = new Filler<User>();
+
+            filler.Setup()
+                .OnType<DateTimeOffset>().Use(dates);
+
+            return filler;
+        }
+
+        private UserProfile CreateRandomUserProfile() =>
+          this.CreateUserProfileFiller(GetRandomDateTimeOffset()).Create();
+
+        private Filler<UserProfile> CreateUserProfileFiller(DateTimeOffset dates)
+        {
+            var filler = new Filler<UserProfile>();
 
             filler.Setup()
                 .OnType<DateTimeOffset>().Use(dates);

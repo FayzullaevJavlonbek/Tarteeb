@@ -22,23 +22,8 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
             Xeption dependencyValidationException)
         {
             // given
-            dynamic randomUserProfileProperties = CreateRandomUserProfileProperties();
-
-            var inputUserProfile = new UserProfile
-            {
-                Id = randomUserProfileProperties.Id,
-                FirstName = randomUserProfileProperties.FirstName,
-                LastName = randomUserProfileProperties.LastName,
-                PhoneNumber = randomUserProfileProperties.PhoneNumber,
-                Email = randomUserProfileProperties.Email,
-                BirthDate = randomUserProfileProperties.BirthDate,
-                IsActive = randomUserProfileProperties.IsActive,
-                IsVerified = randomUserProfileProperties.IsVerified,
-                GitHubUsername = randomUserProfileProperties.GitHubUsername,
-                TelegramUsername = randomUserProfileProperties.TelegramUsername,
-                TeamId = randomUserProfileProperties.TeamId
-            };
-
+            UserProfile randomUserProfile = CreateRandomUserProfile();
+            var inputUserProfile = randomUserProfile;
             Guid inputUserProfileGuid = inputUserProfile.Id;
 
             var expectedUserProfileProcessingValidationException =
@@ -78,23 +63,8 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
             Xeption dependencyException)
         {
             // given
-            dynamic randomUserProfileProperties = CreateRandomUserProfileProperties();
-
-            var inputUserProfile = new UserProfile
-            {
-                Id = randomUserProfileProperties.Id,
-                FirstName = randomUserProfileProperties.FirstName,
-                LastName = randomUserProfileProperties.LastName,
-                PhoneNumber = randomUserProfileProperties.PhoneNumber,
-                Email = randomUserProfileProperties.Email,
-                BirthDate = randomUserProfileProperties.BirthDate,
-                IsActive = randomUserProfileProperties.IsActive,
-                IsVerified = randomUserProfileProperties.IsVerified,
-                GitHubUsername = randomUserProfileProperties.GitHubUsername,
-                TelegramUsername = randomUserProfileProperties.TelegramUsername,
-                TeamId = randomUserProfileProperties.TeamId
-            };
-
+            UserProfile randomUserProfile = CreateRandomUserProfile();
+            var inputUserProfile = randomUserProfile;
             Guid inputUserProfileGuid = inputUserProfile.Id;
 
             var expectedUserProfileProcessingDependencyException = 
