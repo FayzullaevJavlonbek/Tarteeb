@@ -5,6 +5,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Tarteeb.Api.Brokers.DateTimes;
 using Tarteeb.Api.Brokers.Loggings;
 using Tarteeb.Api.Models.Foundations.Emails;
 using Tarteeb.Api.Models.Foundations.Users;
@@ -17,13 +18,16 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
     {
         private readonly IUserService userService;
         private readonly ILoggingBroker loggingBroker;
+        private readonly IDateTimeBroker dateTimeBroker;
 
         public UserProfileProcessingService(
             IUserService userService,
-            ILoggingBroker loggingBroker)
+            ILoggingBroker loggingBroker,
+            IDateTimeBroker dateTimeBroker)
         {
             this.userService = userService;
             this.loggingBroker = loggingBroker;
+            this.dateTimeBroker = dateTimeBroker;
         }
 
         public ValueTask<UserProfile> RetrieveUserProfileByIdAsync(Guid userProfileId) =>
@@ -47,6 +51,7 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
 
             populatedUser.CreatedDate = maybeUser.CreatedDate;
             populatedUser.Password = maybeUser.Password;
+            populatedUser.UpdatedDate = this.dateTimeBroker.GetCurrentDateTime();
             
             User modifiedUser = await this.userService.ModifyUserAsync(populatedUser);
             UserProfile populatedUserProfile = PopulateUserProfile(modifiedUser);

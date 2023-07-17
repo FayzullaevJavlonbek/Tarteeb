@@ -53,6 +53,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
 
             this.userServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Theory]
@@ -92,6 +93,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
 
             this.userServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -134,6 +136,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
 
             this.userServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

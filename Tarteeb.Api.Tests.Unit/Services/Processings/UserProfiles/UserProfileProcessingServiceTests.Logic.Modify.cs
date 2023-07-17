@@ -19,6 +19,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
         public async Task ShouldModifyUserProfileAsync()
         {
             // given
+            var randomDateTimeOffset = GetRandomDateTimeOffset();
             dynamic randomUserProfileProperties = CreateRandomUserProfileProperties();
 
             var randomUserProfile = new UserProfile
@@ -43,6 +44,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 LastName = randomUserProfileProperties.LastName,
                 PhoneNumber = randomUserProfileProperties.PhoneNumber,
                 Email = randomUserProfileProperties.Email,
+                UpdatedDate = randomDateTimeOffset,
                 BirthDate = randomUserProfileProperties.BirthDate,
                 IsActive = randomUserProfileProperties.IsActive,
                 IsVerified = randomUserProfileProperties.IsVerified,
@@ -62,6 +64,10 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 service.RetrieveUserByIdAsync(inputUser.Id))
                     .ReturnsAsync(storageUser);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTime())
+                    .Returns(randomDateTimeOffset);
+
             this.userServiceMock.Setup(service =>
                 service.ModifyUserAsync(It.Is(SameUserAs(inputUser))))
                     .ReturnsAsync(modifiedUser);
@@ -74,13 +80,17 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
             // then
             actualUserProfile.Should().BeEquivalentTo(expectedUserProfile);
 
-            this.userServiceMock.Verify(service => 
+            this.userServiceMock.Verify(service =>
                 service.RetrieveUserByIdAsync(inputUser.Id), Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTime(), Times.Once);
 
             this.userServiceMock.Verify(service =>
                 service.ModifyUserAsync(It.Is(SameUserAs(inputUser))), Times.Once);
 
             this.userServiceMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }

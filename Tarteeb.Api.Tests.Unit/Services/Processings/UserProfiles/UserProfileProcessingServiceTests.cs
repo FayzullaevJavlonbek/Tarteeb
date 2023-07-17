@@ -6,6 +6,7 @@
 using Moq;
 using System;
 using System.Linq.Expressions;
+using Tarteeb.Api.Brokers.DateTimes;
 using Tarteeb.Api.Brokers.Loggings;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
@@ -22,16 +23,19 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
     {
         private readonly Mock<IUserService> userServiceMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
+        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly UserProfileProcessingService userProfileProcessingService;
 
         public UserProfileProcessingServiceTests()
         {
             this.userServiceMock = new Mock<IUserService>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
 
             this.userProfileProcessingService = new UserProfileProcessingService(
                 userService: this.userServiceMock.Object,
-                loggingBroker: this.loggingBrokerMock.Object);
+                loggingBroker: this.loggingBrokerMock.Object,
+                dateTimeBroker: this.dateTimeBrokerMock.Object);
         }
 
         public static TheoryData<Xeption> UserDependencyExceptions()
@@ -99,7 +103,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
         }
 
         private UserProfile CreateRandomUserProfile() =>
-          this.CreateUserProfileFiller(GetRandomDateTimeOffset()).Create();
+            this.CreateUserProfileFiller(GetRandomDateTimeOffset()).Create();
 
         private Filler<UserProfile> CreateUserProfileFiller(DateTimeOffset dates)
         {
