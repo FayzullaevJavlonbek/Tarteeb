@@ -3,7 +3,6 @@
 // Free to use to bring order in your workplace
 //=================================
 
-using System;
 using System.Linq;
 using FluentAssertions;
 using Force.DeepCloner;
@@ -20,50 +19,28 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
         public void ShouldRetrieveAllUserProfiles()
         {
             // given
-            IQueryable<User> randomUsers = CreateRandomUsers();
-            IQueryable<UserProfile> randomUserProfiles = 
-                randomUsers.Select(AsUserProfile).AsQueryable();
-
-            IQueryable<User> returnedUsers = randomUsers;
-            IQueryable<UserProfile> expectedUserProfiles = randomUserProfiles.DeepClone();
+            dynamic[] randomUserProperties = CreateRandomUsersProperties();
+            IQueryable<User> mappedUser = MapToUsers(randomUserProperties);
+            IQueryable<User> returnedUsers = mappedUser;
+            IQueryable<UserProfile> usersProfiles = MapToUsersPropfiles(randomUserProperties);
+            IQueryable<UserProfile> expectedUsersProfiles = usersProfiles.DeepClone();
 
             this.userServiceMock.Setup(service =>
                 service.RetrieveAllUsers())
-                .Returns(returnedUsers);
+                    .Returns(returnedUsers);
 
             // when
             IQueryable<UserProfile> actualUserProfiles =
                 this.userProfileProcessingService.RetrieveAllUserProfiles();
 
             // then 
-            actualUserProfiles.Should().BeEquivalentTo(expectedUserProfiles);
+            actualUserProfiles.Should().BeEquivalentTo(expectedUsersProfiles);
 
             this.userServiceMock.Verify(service => 
                 service.RetrieveAllUsers(), Times.Once);
 
             this.userServiceMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-        }
-
-        private Func<User, UserProfile> AsUserProfile =>
-            user => MapToUserProfile(user);
-
-        private UserProfile MapToUserProfile(User user)
-        {
-            return new UserProfile
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                BirthDate = user.BirthDate,
-                IsActive = user.IsActive,
-                IsVerified = user.IsVerified,
-                GitHubUsername = user.GitHubUsername,
-                TelegramUsername = user.TelegramUsername,
-                TeamId = user.TeamId
-            };
         }
     }
 }

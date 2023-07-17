@@ -3,13 +3,11 @@
 // Free to use to bring order in your workplace
 //=================================
 
-using Moq;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Moq;
 using Tarteeb.Api.Brokers.Loggings;
-using Tarteeb.Api.Models.Foundations.Emails;
-using Tarteeb.Api.Models.Foundations.Teams;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
 using Tarteeb.Api.Models.Processings.UserProfiles;
@@ -68,6 +66,48 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 new UserProfileProcessingDependencyException(someInnerException),
                 new UserProfileProcessingServiceException(someInnerException)
             };
+        }
+
+        private static IQueryable<User> MapToUsers(dynamic[] userProperties)
+        {
+            return userProperties.Select(userProperty => new User
+            {
+                Id = userProperty.Id,
+                FirstName = userProperty.FirstName,
+                LastName = userProperty.LastName,
+                PhoneNumber = userProperty.PhoneNumber,
+                Email = userProperty.Email,
+                BirthDate = userProperty.BirthDate,
+                IsActive = userProperty.IsActive,
+                IsVerified = userProperty.IsVerified,
+                GitHubUsername = userProperty.GitHubUsername,
+                TelegramUsername = userProperty.TelegramUsername,
+                TeamId = userProperty.TeamId
+            }).AsQueryable();
+        }
+
+        private static IQueryable<UserProfile> MapToUsersPropfiles(dynamic[] userProperties)
+        {
+            return userProperties.Select(userProperty => new UserProfile
+            {
+                Id = userProperty.Id,
+                FirstName = userProperty.FirstName,
+                LastName = userProperty.LastName,
+                PhoneNumber = userProperty.PhoneNumber,
+                Email = userProperty.Email,
+                BirthDate = userProperty.BirthDate,
+                IsActive = userProperty.IsActive,
+                IsVerified = userProperty.IsVerified,
+                GitHubUsername = userProperty.GitHubUsername,
+                TelegramUsername = userProperty.TelegramUsername,
+                TeamId = userProperty.TeamId
+            }).AsQueryable();
+        }
+
+        private static dynamic[] CreateRandomUsersProperties()
+        {
+            return Enumerable.Range(0, GetRandomNumber()).Select(
+                items => CreateRandomUserProfileProperties()).ToArray();
         }
 
         private static dynamic CreateRandomUserProfileProperties()
