@@ -15,6 +15,7 @@ namespace Tarteeb.Api.Models.Foundations.Times
         public Guid Id { get; set; }
         public decimal HoursWorked { get; set; }
         public string Comment { get; set; }
+        public DateTimeOffset DateWorked { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
 

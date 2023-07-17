@@ -4,6 +4,7 @@
 //=================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Tarteeb.Api.Brokers.DateTimes;
 using Tarteeb.Api.Brokers.Loggings;
@@ -30,16 +31,28 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             this.dateTimeBroker = dateTimeBroker;
         }
 
+        public IQueryable<UserProfile> RetrieveAllUserProfiles() =>
+        TryCatch(() =>
+        {
+            IQueryable<User> users =
+                this.userService.RetrieveAllUsers();
+
+            return users.Select(AsUserProfile).AsQueryable();
+        });
+
         public ValueTask<UserProfile> RetrieveUserProfileByIdAsync(Guid userProfileId) =>
         TryCatch(async () =>
         {
             ValidateUserProfileId(userProfileId);
             var maybeUser = await this.userService.RetrieveUserByIdAsync(userProfileId);
             ValidateStorageUser(userProfileId, maybeUser);
-            UserProfile populatedUserProfile = PopulateUserProfile(maybeUser);
+            UserProfile mappedUserProfile = MapToUserProfile(maybeUser);
 
-            return populatedUserProfile;
+            return mappedUserProfile;
         });
+
+        private static Func<User, UserProfile> AsUserProfile =>
+            user => MapToUserProfile(user);
 
         public ValueTask<UserProfile> ModifyUserProfileAsync(UserProfile userProfile) =>
         TryCatch(async () =>
@@ -47,20 +60,20 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             ValidateUserProfileOnModify(userProfile);
             var maybeUser = await this.userService.RetrieveUserByIdAsync(userProfile.Id);
             ValidateStorageUser(userProfile.Id, maybeUser);
-            User populatedUser = PopulateUser(userProfile);
+            User populatedUser = MapToUser(userProfile);
 
             populatedUser.CreatedDate = maybeUser.CreatedDate;
             populatedUser.Password = maybeUser.Password;
             populatedUser.UpdatedDate = this.dateTimeBroker.GetCurrentDateTime();
             
             User modifiedUser = await this.userService.ModifyUserAsync(populatedUser);
-            UserProfile populatedUserProfile = PopulateUserProfile(modifiedUser);
+            UserProfile populatedUserProfile = MapToUserProfile(modifiedUser);
 
             return populatedUserProfile;
         });
         
 
-        private UserProfile PopulateUserProfile(User user)
+        private static UserProfile MapToUserProfile(User user)
         {
             return new UserProfile
             {
@@ -78,7 +91,7 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             };
         }
 
-        private User PopulateUser(UserProfile user)
+        private static User MapToUser(UserProfile user)
         {
             return new User
             {

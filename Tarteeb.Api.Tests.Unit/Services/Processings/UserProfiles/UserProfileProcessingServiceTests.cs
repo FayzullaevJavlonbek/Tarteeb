@@ -3,14 +3,16 @@
 // Free to use to bring order in your workplace
 //=================================
 
-using Moq;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Tarteeb.Api.Brokers.DateTimes;
+using Moq;
 using Tarteeb.Api.Brokers.Loggings;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
 using Tarteeb.Api.Models.Processings.UserProfiles;
+using Tarteeb.Api.Models.Processings.UserProfiles.Exceptions;
 using Tarteeb.Api.Services.Foundations.Users;
 using Tarteeb.Api.Services.Processings.UserProfiles;
 using Tynamix.ObjectFiller;
@@ -59,6 +61,59 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
             };
         }
 
+        public static TheoryData<Xeption> UserProfileDependencyExceptions()
+        {
+            var someInnerException = new Xeption();
+
+            return new TheoryData<Xeption>
+            {
+                new UserProfileProcessingDependencyException(someInnerException),
+                new UserProfileProcessingServiceException(someInnerException)
+            };
+        }
+
+        private static IQueryable<User> MapToUsers(dynamic[] userProperties)
+        {
+            return userProperties.Select(userProperty => new User
+            {
+                Id = userProperty.Id,
+                FirstName = userProperty.FirstName,
+                LastName = userProperty.LastName,
+                PhoneNumber = userProperty.PhoneNumber,
+                Email = userProperty.Email,
+                BirthDate = userProperty.BirthDate,
+                IsActive = userProperty.IsActive,
+                IsVerified = userProperty.IsVerified,
+                GitHubUsername = userProperty.GitHubUsername,
+                TelegramUsername = userProperty.TelegramUsername,
+                TeamId = userProperty.TeamId
+            }).AsQueryable();
+        }
+
+        private static IQueryable<UserProfile> MapToUsersPropfiles(dynamic[] userProperties)
+        {
+            return userProperties.Select(userProperty => new UserProfile
+            {
+                Id = userProperty.Id,
+                FirstName = userProperty.FirstName,
+                LastName = userProperty.LastName,
+                PhoneNumber = userProperty.PhoneNumber,
+                Email = userProperty.Email,
+                BirthDate = userProperty.BirthDate,
+                IsActive = userProperty.IsActive,
+                IsVerified = userProperty.IsVerified,
+                GitHubUsername = userProperty.GitHubUsername,
+                TelegramUsername = userProperty.TelegramUsername,
+                TeamId = userProperty.TeamId
+            }).AsQueryable();
+        }
+
+        private static dynamic[] CreateRandomUsersProperties()
+        {
+            return Enumerable.Range(0, GetRandomNumber()).Select(
+                items => CreateRandomUserProfileProperties()).ToArray();
+        }
+
         private static dynamic CreateRandomUserProfileProperties()
         {
             return new
@@ -86,11 +141,18 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
         private static string GetRandomString() =>
             new MnemonicString().GetValue();
 
+        private static int GetRandomNumber() =>
+            new IntRange(min: 2, max: 10).GetValue();
+
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);
 
         private User CreateRandomUser() =>
             this.CreateUserFiller(GetRandomDateTimeOffset()).Create();
+
+        private IQueryable<User> CreateRandomUsers() =>
+            this.CreateUserFiller(GetRandomDateTimeOffset()).Create(count: GetRandomNumber())
+                .ToList().AsQueryable();
 
         private Filler<User> CreateUserFiller(DateTimeOffset dates)
         {
