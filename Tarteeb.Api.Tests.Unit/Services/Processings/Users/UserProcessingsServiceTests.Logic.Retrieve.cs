@@ -36,7 +36,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.Users
 
             // when
             User actualUser = userProcessingsService.
-                RetrieveUserByCredentails(inputEmail, inputPassword);
+                RetrieveUserByCredentials(inputEmail, inputPassword);
 
             // then
             actualUser.Should().BeEquivalentTo(existingUser);

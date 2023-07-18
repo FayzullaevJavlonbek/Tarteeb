@@ -29,7 +29,7 @@ namespace Tarteeb.Api.Services.Processings.Users
             this.loggingBroker = loggingBroker;
         }
 
-        public User RetrieveUserByCredentails(string email, string password) =>
+        public User RetrieveUserByCredentials(string email, string password) =>
         TryCatch(() =>
         {
             ValidateEmailAndPassword(email, password);

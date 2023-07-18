@@ -11,7 +11,7 @@ namespace Tarteeb.Api.Services.Processings.Users
 {
     public interface IUserProcessingService
     {
-        User RetrieveUserByCredentails(string email, string password);
+        User RetrieveUserByCredentials(string email, string password);
         ValueTask<Guid> VerifyUserByIdAsync(Guid userId);
         ValueTask<Guid> ActivateUserByIdAsync(Guid userId);
     }

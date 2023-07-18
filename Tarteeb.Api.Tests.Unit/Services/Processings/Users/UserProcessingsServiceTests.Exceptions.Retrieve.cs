@@ -30,7 +30,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.Users
 
             // when
             Action retrieveUserByAction = () =>
-                this.userProcessingsService.RetrieveUserByCredentails(email: someString, password: someString);
+                this.userProcessingsService.RetrieveUserByCredentials(email: someString, password: someString);
 
             UserProcessingDependencyException actualUserProcessingDependencyException =
                 Assert.Throws<UserProcessingDependencyException>(retrieveUserByAction);

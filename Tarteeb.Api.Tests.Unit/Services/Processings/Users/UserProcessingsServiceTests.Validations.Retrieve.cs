@@ -35,7 +35,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.Users
 
             //when
             Action retrieveUserByAction = () =>
-                this.userProcessingsService.RetrieveUserByCredentails(invalidEmail, invalidPassword);
+                this.userProcessingsService.RetrieveUserByCredentials(invalidEmail, invalidPassword);
 
             UserProcessingValidationException actualUserProcessingValidationException =
                  Assert.Throws<UserProcessingValidationException>(retrieveUserByAction);
