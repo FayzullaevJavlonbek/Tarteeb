@@ -10,7 +10,8 @@ namespace Tarteeb.Api.Models.Processings.UserProfiles.Exceptions
     public class UserProfileProcessingDependencyValidationException : Xeption
     {
         public UserProfileProcessingDependencyValidationException(Xeption innerException)
-            : base(message: "User profile dependency validation error occurred, fix the errors and try again.")
+            : base(message: "User profile dependency validation error occurred, fix the errors and try again.",
+                  innerException)
         { }
     }
 }
