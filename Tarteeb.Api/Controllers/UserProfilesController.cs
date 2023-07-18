@@ -53,7 +53,9 @@ namespace Tarteeb.Api.Controllers
         {
             try
             {
-                return await this.userProfileProcessingService.RetrieveUserProfileByIdAsync(userProfileId);
+                UserProfile retrievedUser = await this.userProfileProcessingService.RetrieveUserProfileByIdAsync(userProfileId);
+
+                return Ok(retrievedUser);
             }
             catch (UserProfileProcessingValidationException userProfileProcessingValidationException)
             {
