@@ -60,7 +60,7 @@ namespace Tarteeb.Api.Controllers
                 return BadRequest(userProfileProcessingValidationException.InnerException);
             }
             catch (UserProfileProcessingDependencyValidationException userProfileProcessingDependencyValidationException)
-                when(userProfileProcessingDependencyValidationException.InnerException is NotFoundUserException)
+                when (userProfileProcessingDependencyValidationException.InnerException is NotFoundUserException)
             {
                 return NotFound(userProfileProcessingDependencyValidationException.InnerException);
             }
@@ -77,6 +77,40 @@ namespace Tarteeb.Api.Controllers
                 return InternalServerError(userProfileProcessingServiceException.InnerException);
             }
         }
+
+        [HttpPut]
+        public async ValueTask<ActionResult<UserProfile>> PutUserProfile(UserProfile userProfile)
+        {
+            try
+            {
+                UserProfile modifiedUserProfile =
+                     await this.userProfileProcessingService.ModifyUserProfileAsync(userProfile);
+
+                return Ok(modifiedUserProfile);
+            }
+            catch (UserProfileProcessingValidationException userProfileProcessingValidationException)
+            {
+                return BadRequest(userProfileProcessingValidationException.InnerException);
+            }
+            catch (UserProfileProcessingDependencyValidationException userProfileProcessingDependencyValidationException)
+                when (userProfileProcessingDependencyValidationException.InnerException is NotFoundUserException)
+            {
+                return NotFound(userProfileProcessingDependencyValidationException.InnerException);
+            }
+            catch (UserProfileProcessingDependencyValidationException userProfileProcessingDependencyValidationException)
+            {
+                return BadRequest(userProfileProcessingDependencyValidationException.InnerException);
+            }
+            catch (UserProfileProcessingDependencyException userProfileProcessingDependencyException)
+            {
+                return InternalServerError(userProfileProcessingDependencyException.InnerException);
+            }
+            catch (UserProfileProcessingServiceException userProfileProcessingServiceException)
+            {
+                return InternalServerError(userProfileProcessingServiceException.InnerException);
+            }
+        }
+
 
     }
 }
