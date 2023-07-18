@@ -35,6 +35,13 @@ namespace Tarteeb.Api.Services.Processings.Users
             {
                 throw CreateAndLogDependencyException(userServiceException);
             }
+            catch (Exception serviceException)
+            {
+                var failedUserProcessingServiceException =
+                    new FailedUserProcessingServiceException(serviceException);
+
+                throw CreateAndLogServiceException(failedUserProcessingServiceException);
+            }
         }
 
         private async ValueTask<Guid> TryCatch(ReturningUserIdFunction returningUserFunctionGuid)
