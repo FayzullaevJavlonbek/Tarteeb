@@ -43,7 +43,9 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
         TryCatch(async () =>
         {
             ValidateUserProfileId(userProfileId);
-            var retrievedUser = await this.userService.RetrieveUserByIdAsync(userProfileId);
+
+            User retrievedUser = 
+                await this.userService.RetrieveUserByIdAsync(userProfileId);
 
             return MapToUserProfile(retrievedUser); ;
         });
