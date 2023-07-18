@@ -32,10 +32,6 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             {
                 throw CreateAndLogValidationException(invalidUserProfileException);
             }
-            catch(NotFoundUserException notFoundUserException)
-            {
-                throw CreateAndLogValidationException(notFoundUserException);
-            }
             catch (UserValidationException userValidationException)
             {
                 throw CreateAndLogDependencyValidationException(userValidationException);

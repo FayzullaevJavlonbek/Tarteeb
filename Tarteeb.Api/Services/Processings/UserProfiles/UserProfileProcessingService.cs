@@ -44,11 +44,9 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
         TryCatch(async () =>
         {
             ValidateUserProfileId(userProfileId);
-            var maybeUser = await this.userService.RetrieveUserByIdAsync(userProfileId);
-            ValidateStorageUser(userProfileId, maybeUser);
-            UserProfile mappedUserProfile = MapToUserProfile(maybeUser);
+            var retrievedUser = await this.userService.RetrieveUserByIdAsync(userProfileId);
 
-            return mappedUserProfile;
+            return MapToUserProfile(retrievedUser); ;
         });
 
         private static Func<User, UserProfile> AsUserProfile =>
