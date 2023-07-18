@@ -3,13 +3,10 @@
 // Free to use to bring order in your workplace
 //=================================
 
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Force.DeepCloner;
 using Moq;
-using Tarteeb.Api.Models.Foundations.Emails;
-using Tarteeb.Api.Models.Foundations.Teams;
+using System.Threading.Tasks;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Processings.UserProfiles;
 using Xunit;
@@ -19,27 +16,11 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
     public partial class UserProfileProcessingServiceTests
     {
         [Fact]
-        public async Task ShouldRetrieveUserByIdAsync()
+        public async Task ShouldModifyUserProfileAsync()
         {
             // given
-            Guid randomUserProfileId = Guid.NewGuid();
-            Guid inputUserProfileId = randomUserProfileId;
+            var randomDateTimeOffset = GetRandomDateTimeOffset();
             dynamic randomUserProfileProperties = CreateRandomUserProfileProperties();
-
-            var randomUser = new User
-            {
-                Id = randomUserProfileProperties.Id,
-                FirstName = randomUserProfileProperties.FirstName,
-                LastName = randomUserProfileProperties.LastName,
-                PhoneNumber = randomUserProfileProperties.PhoneNumber,
-                Email = randomUserProfileProperties.Email,
-                BirthDate = randomUserProfileProperties.BirthDate,
-                IsActive = randomUserProfileProperties.IsActive,
-                IsVerified = randomUserProfileProperties.IsVerified,
-                GitHubUsername = randomUserProfileProperties.GitHubUsername,
-                TelegramUsername = randomUserProfileProperties.TelegramUsername,
-                TeamId = randomUserProfileProperties.TeamId
-            };
 
             var randomUserProfile = new UserProfile
             {
@@ -56,27 +37,61 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 TeamId = randomUserProfileProperties.TeamId
             };
 
-            User returnedUser = randomUser;
-            UserProfile expectedUserProfile = randomUserProfile.DeepClone();
+            var randomUser = new User
+            {
+                Id = randomUserProfileProperties.Id,
+                FirstName = randomUserProfileProperties.FirstName,
+                LastName = randomUserProfileProperties.LastName,
+                PhoneNumber = randomUserProfileProperties.PhoneNumber,
+                Email = randomUserProfileProperties.Email,
+                UpdatedDate = randomDateTimeOffset,
+                BirthDate = randomUserProfileProperties.BirthDate,
+                IsActive = randomUserProfileProperties.IsActive,
+                IsVerified = randomUserProfileProperties.IsVerified,
+                GitHubUsername = randomUserProfileProperties.GitHubUsername,
+                TelegramUsername = randomUserProfileProperties.TelegramUsername,
+                TeamId = randomUserProfileProperties.TeamId
+            };
+
+            UserProfile inputUserProfile = randomUserProfile;
+            UserProfile expectedUserProfile = inputUserProfile.DeepClone();
+
+            User storageUser = randomUser;
+            User inputUser = randomUser;
+            User modifiedUser = inputUser;
 
             this.userServiceMock.Setup(service =>
-                service.RetrieveUserByIdAsync(inputUserProfileId))
-                    .ReturnsAsync(returnedUser);
+                service.RetrieveUserByIdAsync(inputUser.Id))
+                    .ReturnsAsync(storageUser);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTime())
+                    .Returns(randomDateTimeOffset);
+
+            this.userServiceMock.Setup(service =>
+                service.ModifyUserAsync(It.Is(SameUserAs(inputUser))))
+                    .ReturnsAsync(modifiedUser);
 
             // when
-            UserProfile actualUserProfile = 
+            UserProfile actualUserProfile =
                 await this.userProfileProcessingService
-                    .RetrieveUserProfileByIdAsync(inputUserProfileId);
+                    .ModifyUserProfileAsync(inputUserProfile);
 
             // then
             actualUserProfile.Should().BeEquivalentTo(expectedUserProfile);
-            
+
             this.userServiceMock.Verify(service =>
-                service.RetrieveUserByIdAsync(inputUserProfileId), Times.Once);
+                service.RetrieveUserByIdAsync(inputUser.Id), Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTime(), Times.Once);
+
+            this.userServiceMock.Verify(service =>
+                service.ModifyUserAsync(It.Is(SameUserAs(inputUser))), Times.Once);
 
             this.userServiceMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

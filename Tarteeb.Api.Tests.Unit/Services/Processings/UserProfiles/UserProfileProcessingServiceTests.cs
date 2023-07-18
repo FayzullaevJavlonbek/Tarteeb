@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Tarteeb.Api.Brokers.DateTimes;
 using Moq;
 using Tarteeb.Api.Brokers.Loggings;
 using Tarteeb.Api.Models.Foundations.Users;
@@ -24,16 +25,19 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
     {
         private readonly Mock<IUserService> userServiceMock;
         private readonly Mock<ILoggingBroker> loggingBrokerMock;
+        private readonly Mock<IDateTimeBroker> dateTimeBrokerMock;
         private readonly UserProfileProcessingService userProfileProcessingService;
 
         public UserProfileProcessingServiceTests()
         {
             this.userServiceMock = new Mock<IUserService>();
             this.loggingBrokerMock = new Mock<ILoggingBroker>();
+            this.dateTimeBrokerMock = new Mock<IDateTimeBroker>();
 
             this.userProfileProcessingService = new UserProfileProcessingService(
                 userService: this.userServiceMock.Object,
-                loggingBroker: this.loggingBrokerMock.Object);
+                loggingBroker: this.loggingBrokerMock.Object,
+                dateTimeBroker: this.dateTimeBrokerMock.Object);
         }
 
         public static TheoryData<Xeption> UserDependencyExceptions()
@@ -158,6 +162,38 @@ namespace Tarteeb.Api.Tests.Unit.Services.Processings.UserProfiles
                 .OnType<DateTimeOffset>().Use(dates);
 
             return filler;
+        }
+
+        private UserProfile CreateRandomUserProfile() =>
+            this.CreateUserProfileFiller(GetRandomDateTimeOffset()).Create();
+
+        private Filler<UserProfile> CreateUserProfileFiller(DateTimeOffset dates)
+        {
+            var filler = new Filler<UserProfile>();
+
+            filler.Setup()
+                .OnType<DateTimeOffset>().Use(dates);
+
+            return filler;
+        }
+
+        private static Expression<Func<User, bool>> SameUserAs(User expectedUser)
+        {
+            return actualUser =>
+                    actualUser.Id == expectedUser.Id
+                    && actualUser.FirstName == expectedUser.FirstName
+                    && actualUser.LastName == expectedUser.LastName
+                    && actualUser.PhoneNumber == expectedUser.PhoneNumber
+                    && actualUser.Email == expectedUser.Email
+                    && actualUser.BirthDate == expectedUser.BirthDate
+                    && actualUser.CreatedDate == expectedUser.CreatedDate
+                    && actualUser.UpdatedDate == expectedUser.UpdatedDate
+                    && actualUser.Password == expectedUser.Password
+                    && actualUser.IsActive == expectedUser.IsActive
+                    && actualUser.IsVerified == expectedUser.IsVerified
+                    && actualUser.GitHubUsername == expectedUser.GitHubUsername
+                    && actualUser.TelegramUsername == expectedUser.TelegramUsername
+                    && actualUser.TeamId == expectedUser.TeamId;
         }
     }
 }

@@ -22,6 +22,11 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             }
         }
 
+        private void ValidateUserProfileOnModify(UserProfile userProfile)
+        {
+            ValidateUserNotNull(userProfile);
+        }
+
         private void ValidateUserProfileId(Guid userProfileId) =>
             Validate((Rule: IsInvalid(userProfileId), Parameter: nameof(UserProfile.Id)));
 
@@ -47,6 +52,14 @@ namespace Tarteeb.Api.Services.Processings.UserProfiles
             }
 
             invalidUserProfileException.ThrowIfContainsErrors();
+        }
+
+        private static void ValidateUserNotNull(UserProfile userProfile)
+        {
+            if (userProfile is null)
+            {
+                throw new NullUserProfileProcessingException();
+            }
         }
     }
 }
