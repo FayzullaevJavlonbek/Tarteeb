@@ -4,9 +4,12 @@
 //=================================
 
 using System;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RESTFulSense.Controllers;
+using Tarteeb.Api.Models.Foundations.Users.Exceptions;
+using Tarteeb.Api.Models.Processings.Users;
 using Tarteeb.Api.Services.Processings.Users;
 
 namespace Tarteeb.Api.Controllers
@@ -23,9 +26,33 @@ namespace Tarteeb.Api.Controllers
         [HttpGet("{userId}")]
         public async ValueTask<ActionResult<Guid>> VerifyUserByIdAsync(Guid userId)
         {
-            Guid verifiedId = await this.userProcessingService.VerifyUserByIdAsync(userId);
+            try
+            {
+                Guid verifiedId = await this.userProcessingService.VerifyUserByIdAsync(userId);
 
-            return Ok(verifiedId);
+                return Ok(verifiedId);
+            }
+            catch (UserProcessingValidationException userProcessingValidationException)
+            {
+                return BadRequest(userProcessingValidationException.InnerException);
+            }
+            catch (UserProcessingDependencyValidationException userProcessingDependencyValidationException)
+                when(userProcessingDependencyValidationException.InnerException is NotFoundUserException)
+            {
+                return NotFound(userProcessingDependencyValidationException.InnerException);
+            }
+            catch (UserProcessingDependencyValidationException userProcessingDependencyValidationException)
+            {
+                return BadRequest(userProcessingDependencyValidationException.InnerException);
+            }
+            catch (UserProcessingDependencyException userProcessingDependencyException)
+            {
+                return InternalServerError(userProcessingDependencyException.InnerException);
+            }
+            catch(UserProcessingServiceException userProcessingServiceException)
+            {
+                return InternalServerError(userProcessingServiceException.InnerException);
+            }
         }
 
         [HttpPost]
