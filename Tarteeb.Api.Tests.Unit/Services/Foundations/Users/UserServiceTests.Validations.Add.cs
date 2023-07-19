@@ -211,7 +211,7 @@ namespace Tarteeb.Api.Tests.Unit.Services.Foundations.Users
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public async Task ShouldThrowValidationExceptionOnAddIfEmailIsInvalidAndLogItAsync(string? invalidText)
+        public async Task ShouldThrowValidationExceptionOnAddIfEmailIsInvalidAndLogItAsync(string invalidText)
         {
             //given
             var invalidEmail = invalidText;
