@@ -35,7 +35,6 @@ namespace Tarteeb.Api.Services.Orchestrations
                 throw CreateAndLogValidationException(notFoundUserException);
             }
             catch (UserValidationException userValidationException) 
-                when (userValidationException.InnerException is InsecurePasswordException)
             {
                 throw CreateAndLogDependencyValidationException(userValidationException);
             }
