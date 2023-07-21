@@ -6,6 +6,7 @@
 using System;
 using System.Threading.Tasks;
 using Tarteeb.Api.Models.Foundations.Emails.Exceptions;
+using Tarteeb.Api.Models.Foundations.Securities.Exceptions;
 using Tarteeb.Api.Models.Foundations.Users;
 using Tarteeb.Api.Models.Foundations.Users.Exceptions;
 using Tarteeb.Api.Models.Orchestrations.UserTokens;
@@ -32,6 +33,11 @@ namespace Tarteeb.Api.Services.Orchestrations
             catch (NotFoundUserException notFoundUserException)
             {
                 throw CreateAndLogValidationException(notFoundUserException);
+            }
+            catch (UserValidationException userValidationException) 
+                when (userValidationException.InnerException is InsecurePasswordException)
+            {
+                throw CreateAndLogDependencyValidationException(userValidationException);
             }
             catch (UserDependencyException userDependencyException)
             {
